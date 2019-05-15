@@ -16,6 +16,61 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 
 const val KotlinLog = "kotlinTest"
+const val CmdHff: Byte = 0xff.toByte()
+const val CmdHd55: Byte = 0x55.toByte()
+const val CmdDevHost = 0x80.toByte()
+const val CmdDevSrc = 0x06.toByte()
+const val CmdDevAg = 0x00.toByte()
+
+enum class CmdId(val value: Byte) {
+    SET_HFP_PAIR_REQ(0x02.toByte()),
+    SET_HFP_PAIR_RSP(0x03.toByte()),
+    SET_SRC_VOL_REQ(0x04.toByte()),
+    SET_SRC_VOL_RSP(0x05.toByte()),
+    SET_AG_VOL_REQ(0x06.toByte()),
+    SET_AG_VOL_RSP(0x07.toByte()),
+    SET_HFP_VOL_REQ(0x08.toByte()),
+    SET_HFP_VOL_RSP(0x09.toByte()),
+    SET_HFP_EXT_STA_REQ(0x0c.toByte()),
+    SET_HFP_EXT_STA_RSP(0x0d.toByte()),
+    SET_FEATURE_REQ(0x0e.toByte()),
+    SET_FEATURE_RSP(0x0f.toByte()),
+    SET_HFP_PARAMETER_REQ(0x10.toByte()),
+    SET_HFP_PARAMETER_RSP(0x11.toByte()),
+    SET_AG_PARAMETER_REQ(0x12.toByte()),
+    SET_AG_PARAMETER_RSP(0x13.toByte()),
+    SET_HFP_LOCAL_NAME_REQ(0x14.toByte()),
+    SET_HFP_LOCAL_NAME_RSP(0x15.toByte()),
+    SET_AG_LOCAL_NAME_REQ(0x16.toByte()),
+    SET_AG_LOCAL_NAME_RSP(0x17.toByte()),
+
+    GET_HFP_PAIR_REQ(0x42.toByte()),
+    GET_HFP_PAIR_RSP(0x43.toByte()),
+    GET_SRC_VOL_REQ(0x44.toByte()),
+    GET_SRC_VOL_RSP(0x45.toByte()),
+    GET_AG_VOL_REQ(0x46.toByte()),
+    GET_AG_VOL_RSP(0x47.toByte()),
+    GET_HFP_VOL_REQ(0x48.toByte()),
+    GET_HFP_VOL_RSP(0x49.toByte()),
+    GET_HFP_STA_REQ(0x4a.toByte()),
+    GET_HFP_STA_RSP(0x4b.toByte()),
+    GET_HFP_EXT_STA_REQ(0x4c.toByte()),
+    GET_HFP_EXT_STA_RSP(0x4d.toByte()),
+    GET_FEATURE_REQ(0x4e.toByte()),
+    GET_FEATURE_RSP(0x4f.toByte()),
+    GET_HFP_PARAMETER_REQ(0x50.toByte()),
+    GET_HFP_PARAMETER_RSP(0x51.toByte()),
+    GET_AG_PARAMETER_REQ(0x52.toByte()),
+    GET_AG_PARAMETER_RSP(0x53.toByte()),
+    GET_HFP_LOCAL_NAME_REQ(0x54.toByte()),
+    GET_HFP_LOCAL_NAME_RSP(0x55.toByte()),
+    GET_AG_LOCAL_NAME_REQ(0x56.toByte()),
+    GET_AG_LOCAL_NAME_RSP(0x57.toByte()),
+    GET_HFP_VRESION_REQ(0x58.toByte()),
+    GET_HFP_VRESION_RSP(0x59.toByte()),
+    GET_AG_VRESION_REQ(0x5a.toByte()),
+    GET_AG_VRESION_RSP(0x5b.toByte());
+}
 
 class MainActivity : AppCompatActivity() {
     lateinit var preferData : SharedPreferences
@@ -132,30 +187,34 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         btnGetFwVer0.setOnClickListener {
-            val getFwCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x07, 0x04, 2, 0x04, 0xff.toByte(), 0x00)
+            val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_HFP_VRESION_REQ.value , 0, 0x00)
 
             btCmdSend(getFwCmd, 0)
             txvFwVer0.text = "none"
         }
 
         btnGetFwVer1.setOnClickListener {
-            val getFwCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x07, 0x04, 2, 0x04, 0xff.toByte(), 0x00)
+            // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, 0x04, 2, 0x04, 0xff.toByte(), 0x00)
+            val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_VRESION_REQ.value , 0, 0x00)
 
-            btCmdSend(getFwCmd, 1)
+            // btCmdSend(getFwCmd, 1)
+            btCmdSend(getFwCmd, 0)
             txvFwVer1.text = "none"
         }
 
         btnGetName0.setOnClickListener {
-            val getNameCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x07, 0x04, 2, 0x04, 0x88.toByte(), 0x00)
+            val getNameCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_HFP_LOCAL_NAME_REQ.value, 0, 0x00)
 
             btCmdSend(getNameCmd, 0)
-            txvGetVer0.text = "none"
+            txvGetName0.text = "none"
         }
 
         btnGetName1.setOnClickListener {
-            val getNameCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x07, 0x04, 2, 0x04, 0x88.toByte(), 0x00)
+            // val getNameCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, 0x04, 2, 0x04, 0x88.toByte(), 0x00)
+            val getNameCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_LOCAL_NAME_REQ.value, 0, 0x00)
 
-            btCmdSend(getNameCmd, 1)
+            //btCmdSend(getNameCmd, 1)
+            btCmdSend(getNameCmd, 0)
             txvGetName1.text = "none"
         }
 
@@ -389,9 +448,27 @@ class MainActivity : AppCompatActivity() {
         // Log.d(ktLog, "${rfcRecData[i]}")
         // Log.d(KotlinLog, "command src ${cmdBuf[2].toString(16)} id ${cmdBuf[4].toString(16)}")
         when(cmdBuf[4]) {
-            0x5.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} AG volume set")
-            0x7.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP volume set")
-            0x49.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP status get")
+            CmdId.SET_AG_VOL_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} AG volume set")
+            CmdId.SET_HFP_VOL_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP volume set")
+            CmdId.GET_HFP_STA_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP status get")
+            CmdId.GET_HFP_EXT_STA_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP extra status get")
+            CmdId.GET_HFP_LOCAL_NAME_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} local name")
+                txvGetName0.text = String(cmdBuf, 6, cmdBuf[5].toInt())
+            }
+            CmdId.GET_AG_LOCAL_NAME_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} local name")
+                txvGetName1.text = String(cmdBuf, 6, cmdBuf[5].toInt())
+            }
+            CmdId.GET_HFP_VRESION_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} firmware version")
+                txvFwVer0.text = String(cmdBuf, 6, cmdBuf[5].toInt())
+            }
+            CmdId.GET_AG_VRESION_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} firmware version")
+                txvFwVer1.text = String(cmdBuf, 6, cmdBuf[5].toInt())
+            }
+
             else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)}")
         }
     }
