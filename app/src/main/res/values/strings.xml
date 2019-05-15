@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MyBtDual</string>
+    <string name="title_activity_bluetoothctivity">Bluetoothctivity</string>
+    <string name="btnCon0">Btcon0</string>
+    <string name="btnCon1">Btcon1</string>
+    <string name="btnGetVer0">GetVer</string>
+    <string name="btnGetVer1">GetVer</string>
+    <string name="btnGetName0">GetName</string>
+    <string name="btnGetName1">GetName</string>
+    <string name="btnBtDiscovery">Discovery</string>
+    <string name="btnPaired">Paired</string>
+    <string name="txvBtState0">bluetooth disable</string>
+    <string name="txvBtState1">bluetooth disable</string>
+    <string name="title_activity_bt_app">btAppActivity</string>
+</resources>

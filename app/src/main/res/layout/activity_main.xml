@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/activityId"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context=".MainActivity">
+
+    <TextView
+            android:id="@+id/txvBtState0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txvBtState0"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@+id/btncon1"
+            app:layout_constraintTop_toTopOf="@+id/btncon0" />
+
+    <Button
+            android:id="@+id/btncon0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btnCon0"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+            android:id="@+id/btnPairedList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btnPaired"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toStartOf="@+id/btncon0"
+            app:layout_constraintTop_toBottomOf="@+id/btnGetFwVer0" />
+
+    <Button
+            android:id="@+id/btnGetFwVer0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btnGetVer0"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toStartOf="@+id/btncon0"
+            app:layout_constraintTop_toBottomOf="@+id/btnGetName0" />
+
+    <TextView
+            android:id="@+id/txvFwVer0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="none"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0"
+            app:layout_constraintTop_toTopOf="@+id/btnGetFwVer0" />
+
+    <Button
+            android:id="@+id/btnGetName0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btnGetName0"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toStartOf="@+id/btncon0"
+            app:layout_constraintTop_toBottomOf="@+id/btncon0" />
+
+    <TextView
+            android:id="@+id/txvGetVer0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="none"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0"
+            app:layout_constraintTop_toTopOf="@+id/btnGetName0" />
+
+    <Button
+            android:id="@+id/btnBtDiscovery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnBtDiscovery"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toStartOf="@+id/btncon1"
+            app:layout_constraintTop_toTopOf="@+id/btnPairedList" />
+
+    <TextView
+            android:id="@+id/txvDiscoveryStr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="none device"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btnPairedList"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0"
+            app:layout_constraintTop_toTopOf="@+id/btnPairedList" />
+
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleViewDiscovery"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/btncon0"
+            app:layout_constraintTop_toBottomOf="@+id/btnBtDiscovery" />
+
+    <Button
+            android:id="@+id/btncon1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnCon1"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toEndOf="@+id/btncon0"
+            app:layout_constraintTop_toTopOf="@+id/btncon0" />
+
+    <Button
+            android:id="@+id/btnGetName1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnGetName1"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toEndOf="@+id/btnGetName0"
+            app:layout_constraintTop_toTopOf="@+id/btnGetName0" />
+
+    <Button
+            android:id="@+id/btnGetFwVer1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnGetVer1"
+            android:textAllCaps="false"
+            app:layout_constraintStart_toEndOf="@+id/btnGetFwVer0"
+            app:layout_constraintTop_toTopOf="@+id/btnGetFwVer0" />
+
+    <TextView
+            android:id="@+id/txvBtState1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txvBtState1"
+            app:layout_constraintBottom_toBottomOf="@+id/btncon0"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0" />
+
+    <TextView
+            android:id="@+id/txvGetName1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="none"
+            app:layout_constraintBottom_toBottomOf="@+id/btnGetName0"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0" />
+
+    <TextView
+            android:id="@+id/txvFwVer1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="none"
+            app:layout_constraintBottom_toBottomOf="@+id/btnGetFwVer0"
+            app:layout_constraintStart_toStartOf="@+id/txvBtState0" />
+
+</android.support.constraint.ConstraintLayout>
