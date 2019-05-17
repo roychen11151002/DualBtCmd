@@ -19,7 +19,7 @@ const val KotlinLog = "kotlinTest"
 const val CmdHff: Byte = 0xff.toByte()
 const val CmdHd55: Byte = 0x55.toByte()
 const val CmdDevHost = 0x80.toByte()
-const val CmdDevSrc = 0x06.toByte()
+const val CmdDevSrc = 0x16.toByte()
 const val CmdDevAg = 0x00.toByte()
 
 enum class CmdId(val value: Byte) {
@@ -31,18 +31,24 @@ enum class CmdId(val value: Byte) {
     SET_AG_VOL_RSP(0x07.toByte()),
     SET_HFP_VOL_REQ(0x08.toByte()),
     SET_HFP_VOL_RSP(0x09.toByte()),
+    SET_HFP_STA_REQ(0x0a.toByte()),
+    SET_HFP_STA_RSP(0x0b.toByte()),
     SET_HFP_EXT_STA_REQ(0x0c.toByte()),
     SET_HFP_EXT_STA_RSP(0x0d.toByte()),
-    SET_FEATURE_REQ(0x0e.toByte()),
-    SET_FEATURE_RSP(0x0f.toByte()),
-    SET_HFP_PARAMETER_REQ(0x10.toByte()),
-    SET_HFP_PARAMETER_RSP(0x11.toByte()),
-    SET_AG_PARAMETER_REQ(0x12.toByte()),
-    SET_AG_PARAMETER_RSP(0x13.toByte()),
+    SET_HFP_SPKEY_REQ(0x10.toByte()),
+    SET_HFP_SPKEY_RSP(0x11.toByte()),
+    SET_AG_SPKEY_REQ(0x12.toByte()),
+    SET_AG_SPKEY_RSP(0x13.toByte()),
     SET_HFP_LOCAL_NAME_REQ(0x14.toByte()),
     SET_HFP_LOCAL_NAME_RSP(0x15.toByte()),
     SET_AG_LOCAL_NAME_REQ(0x16.toByte()),
     SET_AG_LOCAL_NAME_RSP(0x17.toByte()),
+    SET_HFP_FEATURE_REQ(0x1c.toByte()),
+    SET_HFP_FEATURE_RSP(0x1d.toByte()),
+    SET_AG_FEATURE_REQ(0x1e.toByte()),
+    SET_AG_FEATURE_RSP(0x1f.toByte()),
+    SET_DFU_REQ(0x3e.toByte()),
+    SETDFU_RSP(0x3f.toByte()),
 
     GET_HFP_PAIR_REQ(0x42.toByte()),
     GET_HFP_PAIR_RSP(0x43.toByte()),
@@ -56,12 +62,12 @@ enum class CmdId(val value: Byte) {
     GET_HFP_STA_RSP(0x4b.toByte()),
     GET_HFP_EXT_STA_REQ(0x4c.toByte()),
     GET_HFP_EXT_STA_RSP(0x4d.toByte()),
-    GET_FEATURE_REQ(0x4e.toByte()),
-    GET_FEATURE_RSP(0x4f.toByte()),
-    GET_HFP_PARAMETER_REQ(0x50.toByte()),
-    GET_HFP_PARAMETER_RSP(0x51.toByte()),
-    GET_AG_PARAMETER_REQ(0x52.toByte()),
-    GET_AG_PARAMETER_RSP(0x53.toByte()),
+    CMD_GET_SRC_DEV_NO_REQ(0x4e.toByte()),
+    CMD_GET_SRC_DEV_NO_RSP(0x4f.toByte()),
+    GET_HFP_SPKEY_REQ(0x50.toByte()),
+    GET_HFP_SPKEY_RSP(0x51.toByte()),
+    GET_AG_SPKEY_REQ(0x52.toByte()),
+    GET_AG_SPKEY_RSP(0x53.toByte()),
     GET_HFP_LOCAL_NAME_REQ(0x54.toByte()),
     GET_HFP_LOCAL_NAME_RSP(0x55.toByte()),
     GET_AG_LOCAL_NAME_REQ(0x56.toByte()),
@@ -69,7 +75,11 @@ enum class CmdId(val value: Byte) {
     GET_HFP_VRESION_REQ(0x58.toByte()),
     GET_HFP_VRESION_RSP(0x59.toByte()),
     GET_AG_VRESION_REQ(0x5a.toByte()),
-    GET_AG_VRESION_RSP(0x5b.toByte());
+    GET_AG_VRESION_RSP(0x5b.toByte()),
+    GET_HFP_FEATURE_REQ(0x5c.toByte()),
+    GET_HFP_FEATURE_RSP(0x5d.toByte()),
+    GET_AG_FEATURE_REQ(0x5e.toByte()),
+    GET_AG_FEATURE_RSP(0x5f.toByte())
 }
 
 class MainActivity : AppCompatActivity() {
@@ -92,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
             if(msg != null)
             {
-                Log.d(KotlinLog, "client message: ${msg.what}, arg1: ${msg.arg1}, arg2: ${msg.arg2}")
+                // Log.d(KotlinLog, "client message: ${msg.what}, arg1: ${msg.arg1}, arg2: ${msg.arg2}")
                 clientBundle = msg.data
                 when(msg.what)
                 {
@@ -188,6 +198,7 @@ class MainActivity : AppCompatActivity() {
 
         btnGetFwVer0.setOnClickListener {
             val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_HFP_VRESION_REQ.value , 0, 0x00)
+            // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.CMD_GET_SRC_DEV_NO_REQ.value , 0, 0x00)
 
             btCmdSend(getFwCmd, 0)
             txvFwVer0.text = "none"
@@ -468,7 +479,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} firmware version")
                 txvFwVer1.text = String(cmdBuf, 6, cmdBuf[5].toInt())
             }
-
+            CmdId.CMD_GET_SRC_DEV_NO_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} source device number ${cmdBuf[6].toString(16)}")
+            }
             else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)}")
         }
     }

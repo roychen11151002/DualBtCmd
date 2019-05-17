@@ -217,7 +217,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
         while(rfcSocket.isConnected) {
             if(!isRfcRecCmd) {
                 try {
-                    Log.d(KotlinLog, "bluetooth read data $btDevice")
+                    // Log.d(KotlinLog, "bluetooth read data $btDevice")
                     rfcRecDataLen += rfcSocket.inputStream.read(rfcRecData, rfcRecDataLen, rfcRecDataMaxLen - rfcRecDataLen)
                 } catch (e: IOException) {
                     Log.d(KotlinLog, "bluetooth read fail")
@@ -247,7 +247,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
                             sendMsgToClient(btReadMsg)
                             isRfcRecHead = false
                             i = 0
-                            SystemClock.sleep(1)
+                            SystemClock.sleep(10)
                             continue
                         }
                     }

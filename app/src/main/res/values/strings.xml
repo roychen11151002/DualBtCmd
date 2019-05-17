@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyBtDual</string>
+    <string name="app_name">DualBtCmd</string>
     <string name="title_activity_bluetoothctivity">Bluetoothctivity</string>
     <string name="btnCon0">Btcon0</string>
     <string name="btnCon1">Btcon1</string>
