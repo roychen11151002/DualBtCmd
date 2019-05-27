@@ -17,8 +17,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 
 const val KotlinLog = "kotlinTest"
-const val CmdHff: Byte = 0xff.toByte()
-const val CmdHd55: Byte = 0x55.toByte()
+const val CmdHff = 0xff.toByte()
+const val CmdHd55 = 0x55.toByte()
 const val CmdDevHost = 0x80.toByte()
 const val CmdDevSrc = 0x30.toByte()
 const val CmdDevAg = 0x00.toByte()
@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         btnGetFwVer1.setOnClickListener {
             // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, 0x04, 2, 0x04, 0xff.toByte(), 0x00)
             // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_HFP_PAIR_REQ.value , 0, 0x00)
-             val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_VRESION_REQ.value , 0, 0x00)
+            val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_VRESION_REQ.value , 0, 0x00)
 
             // btCmdSend(getFwCmd, 1)
             btCmdSend(getFwCmd, 0)
@@ -492,6 +492,13 @@ class MainActivity : AppCompatActivity() {
             }
             CmdId.GET_HFP_VOL_RSP.value -> {
                 Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} volume ${cmdBuf[6].toString(16)}")
+            }
+            CmdId.GET_HFP_PAIR_RSP.value -> {
+                var bdaLap = cmdBuf[6].toUInt().and(0xff.toUInt()).shl(24) + cmdBuf[7].toUInt().and(0xff.toUInt()).shl(16) + cmdBuf[8].toUInt().and(0xff.toUInt()).shl(8) + cmdBuf[9].toUInt().and(0xff.toUInt())
+                var bdaUap = cmdBuf[10].toUByte()
+                var bdaNap = cmdBuf[11].toUInt().and(0xff.toUInt()).shl(8) + cmdBuf[12].toUInt().and(0xff.toUInt())
+
+                Log.d(KotlinLog, "BDA ${bdaNap.toString(16)} : ${bdaUap.toString(16)} : ${bdaLap.toString(16)}")
             }
             else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)}")
         }
