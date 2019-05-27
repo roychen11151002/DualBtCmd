@@ -14,6 +14,8 @@ import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
+const val BtServerLog = "kotlinBtServer"
+
 class BtService : Service() {
     private val btHandler = Messenger(BtMsgHandle())
     private lateinit var clientMsgHandler: Messenger
@@ -33,13 +35,13 @@ class BtService : Service() {
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
             if (msg != null) {
-                Log.d(KotlinLog, "service message: ${msg.what}, arg1: ${msg.arg1}, arg2: ${msg.arg2}")
+                Log.d(BtServerLog, "service message: ${msg.what}, arg1: ${msg.arg1}, arg2: ${msg.arg2}")
                 // clientMsgHandler = msg.replyTo
                 when(msg.what) {
                     100 -> {
                         clientMsgHandler = msg.replyTo
                         for(i in 0 until maxBtDevice) {
-                            Log.d(KotlinLog, "class init $i")
+                            Log.d(BtServerLog, "class init $i")
                             myBtDevice[i].btMessenger = clientMsgHandler
                         }
                     }
@@ -49,10 +51,10 @@ class BtService : Service() {
                         maxBtDevice = msg.arg2
                         serviceMsg = Message.obtain(null, 0, 0, 0)
                         clientMsgHandler = msg.replyTo
-                        //Log.d(KotlinLog, "${myBtDevice.size}")
+                        //Log.d(BtServerLog, "${myBtDevice.size}")
                         myBtDevice = arrayOfNulls<MyBtDevice>(maxBtDevice) as Array<MyBtDevice>
                         for(i in 0 until maxBtDevice) {
-                            Log.d(KotlinLog, "class init $i")
+                            Log.d(BtServerLog, "class init $i")
                             myBtDevice[i] = MyBtDevice(clientMsgHandler, "00:00:00:00:00:00", i)
                         }
                         myBtDevice[0].sendMsgToClient(serviceMsg)
@@ -67,7 +69,7 @@ class BtService : Service() {
                             0 -> {
                                 val btBda = msg.data.getStringArray("remoteBda")
 
-                                Log.d(KotlinLog, "service receive device: ${msg.arg1} bda0: ${btBda[0]}, bda1: ${btBda[1]}")
+                                Log.d(BtServerLog, "service receive device: ${msg.arg1} bda0: ${btBda[0]}, bda1: ${btBda[1]}")
                                 myBtDevice[msg.arg1].btBda = btBda[msg.arg1]
                                 if(myBtDevice[msg.arg1].isConnected())
                                     myBtDevice[msg.arg1].close()
@@ -76,20 +78,20 @@ class BtService : Service() {
                                     myBtDevice[msg.arg1].connect()
                             }
                             1 -> {
-                                Log.d(KotlinLog, "bluetooth disconnect device: ${msg.arg1}")
+                                Log.d(BtServerLog, "bluetooth disconnect device: ${msg.arg1}")
                                 myBtDevice[msg.arg1].close()
                             }
                             2 -> {
                                 val paired = btAdapter.bondedDevices
                                 val pairedStr = ArrayList<String>()
 
-                                Log.d(KotlinLog, "pair command")
+                                Log.d(BtServerLog, "pair command")
                                 pairedStr.clear()
                                 if(paired.size > 0) {
                                     for(device: BluetoothDevice in paired) {
                                         // pairedList.add(device)
                                         pairedStr.add(device.name + " + " + device.address)
-                                        Log.d(KotlinLog, "${device.name} + ${device.address}")
+                                        Log.d(BtServerLog, "${device.name} + ${device.address}")
                                     }
                                 }
                                 serviceBundle.putStringArrayList("pairedList", pairedStr)
@@ -109,7 +111,7 @@ class BtService : Service() {
                                     btAdapter.cancelDiscovery()
                             }
                             else -> {
-                                Log.d(KotlinLog, "unknown command")
+                                Log.d(BtServerLog, "unknown command")
                             }
                         }
                     }
@@ -118,25 +120,25 @@ class BtService : Service() {
                         val cmd = serviceBundle.getByteArray("rfcCmd")
                         myBtDevice[msg.arg1].rfcCmdSend((cmd))
                     }
-                    else -> Log.d(KotlinLog, "service message other")
+                    else -> Log.d(BtServerLog, "service message other")
                 }
             }
         }
 
         inner class btReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                // Log.d(KotlinLog, "bluetooth discovery receiver")
+                // Log.d(BtServerLog, "bluetooth discovery receiver")
                 if(intent != null) {
                     when(intent.action) {
                         BluetoothDevice.ACTION_FOUND -> {
                             val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
 
-                            Log.d(KotlinLog, "bluetooth receiver ACTION_FOUND")
+                            Log.d(BtServerLog, "bluetooth receiver ACTION_FOUND")
                             if(!discoveryList.contains(device)) {
                                 discoveryList.add(device)
                                 discoveryStr.add(device.name + " + " + device.address)
 
-                                Log.d(KotlinLog, "${device.name}, ${device.address}")
+                                Log.d(BtServerLog, "${device.name}, ${device.address}")
                                 serviceBundle.putString("discoveryStr", device.name + " + " + device.address)
                                 serviceMsg = Message.obtain(null, 1, 0, 3)
                                 serviceMsg.data = serviceBundle
@@ -144,17 +146,17 @@ class BtService : Service() {
                             }
                         }
                         BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-                            Log.d(KotlinLog, "bluetooth receiver ACTION_DISCOVERY_FINISHED")
+                            Log.d(BtServerLog, "bluetooth receiver ACTION_DISCOVERY_FINISHED")
                             serviceBundle.putStringArrayList("discoveryList", discoveryStr)
                             serviceMsg = Message.obtain(null, 1, 0, 4)
                             serviceMsg.data = serviceBundle
                             myBtDevice[0].sendMsgToClient(serviceMsg)
                         }
                         BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {
-                            Log.d(KotlinLog, "bluetooth receiver ACTION_BOND_STATE_CHANGED")
+                            Log.d(BtServerLog, "bluetooth receiver ACTION_BOND_STATE_CHANGED")
                         }
                         BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                            Log.d(KotlinLog, "bluetooth receiver ACTION_ACL_DISCONNECTED")
+                            Log.d(BtServerLog, "bluetooth receiver ACTION_ACL_DISCONNECTED")
                             for(i in 0 until maxBtDevice) {
                                 if(!myBtDevice[i].isConnected()) {
                                     serviceMsg = Message.obtain(null, 1, i, 1)
@@ -163,7 +165,7 @@ class BtService : Service() {
                             }
                         }
                         else -> {
-                            Log.d(KotlinLog, "bluetooth receiver other action")
+                            Log.d(BtServerLog, "bluetooth receiver other action")
                         }
                     }
                 }
@@ -178,17 +180,17 @@ class BtService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(KotlinLog, "BtService onCreate")
+        Log.d(BtServerLog, "BtService onCreate")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(KotlinLog, "BtService onStartCommand")
+        Log.d(BtServerLog, "BtService onStartCommand")
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(KotlinLog, "bluetooth service onDestroy")
+        Log.d(BtServerLog, "bluetooth service onDestroy")
         for(i in 0 until maxBtDevice) {
             if(myBtDevice[i].isConnected())
                 myBtDevice[i].close()
@@ -213,14 +215,14 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
         var isRfcRecHead = false
         val rfcRecData = ByteArray(rfcRecDataMaxLen)
 
-        Log.d(KotlinLog, "thread running")
+        Log.d(BtServerLog, "thread running")
         while(rfcSocket.isConnected) {
             if(!isRfcRecCmd) {
                 try {
-                    // Log.d(KotlinLog, "bluetooth read data $btDevice")
+                    // Log.d(BtServerLog, "bluetooth read data $btDevice")
                     rfcRecDataLen += rfcSocket.inputStream.read(rfcRecData, rfcRecDataLen, rfcRecDataMaxLen - rfcRecDataLen)
                 } catch (e: IOException) {
-                    Log.d(KotlinLog, "bluetooth read fail")
+                    Log.d(BtServerLog, "bluetooth read fail")
                     break
                 }
             }
@@ -247,7 +249,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
                             sendMsgToClient(btReadMsg)
                             isRfcRecHead = false
                             i = 0
-                            SystemClock.sleep(10)
+                            SystemClock.sleep(3)
                             continue
                         }
                     }
@@ -261,7 +263,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
                 rfcRecDataLen = 0
             }
         }
-        Log.d(KotlinLog, "bluetooth $btDevice disconnect and read thread free")
+        Log.d(BtServerLog, "bluetooth $btDevice disconnect and read thread free")
         isBtConnected = false
         btReadMsg = Message.obtain(null, 1, btDevice, 1)
         sendMsgToClient(btReadMsg)
@@ -271,15 +273,15 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
         Thread(Runnable {
             var btConMsg: Message
 
-            Log.d(KotlinLog, "\tconnect remote bluetooth address: ${btBda}")
+            Log.d(BtServerLog, "\tconnect remote bluetooth address: ${btBda}")
             rfcSocket = btAdapter.getRemoteDevice(btBda).createRfcommSocketToServiceRecord(SppUuid)
             if(!rfcSocket.isConnected) {
                 for(i in 0 until 1) {
                     try {
-                        Log.d(KotlinLog, "bluetooth connecting $btDevice")
+                        Log.d(BtServerLog, "bluetooth connecting $btDevice")
                         rfcSocket.connect()
                     } catch (e: IOException) {
-                        Log.d(KotlinLog, "bluetooth connect fail $btDevice")
+                        Log.d(BtServerLog, "bluetooth connect fail $btDevice")
                     }
                     if(rfcSocket.isConnected) {
                         thread = Thread(btRead)
@@ -291,11 +293,11 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
             }
 
             if(rfcSocket.isConnected) {
-                Log.d(KotlinLog, "bluetooth connected $btDevice")
+                Log.d(BtServerLog, "bluetooth connected $btDevice")
                 isBtConnected = true
                 btConMsg = Message.obtain(null, 1, btDevice, 0)
             } else {
-                Log.d(KotlinLog, "bluetooth disconnect $btDevice")
+                Log.d(BtServerLog, "bluetooth disconnect $btDevice")
                 isBtConnected = false
                 btConMsg = Message.obtain(null, 1, btDevice, 1)
             }
@@ -305,7 +307,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
 
     fun close()
     {
-        Log.d(KotlinLog, "bluetooth $btDevice socket close")
+        Log.d(BtServerLog, "bluetooth $btDevice socket close")
         rfcSocket.close()
         isBtConnected = false
     }
@@ -337,7 +339,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
         try {
             btMessenger.send(msg)
         } catch (e: IOException) {
-            Log.d(KotlinLog, "service send message exception")
+            Log.d(BtServerLog, "service send message exception")
             e.printStackTrace()
         }
     }

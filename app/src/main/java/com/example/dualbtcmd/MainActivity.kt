@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.*
+import android.os.SystemClock.sleep
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -19,7 +20,7 @@ const val KotlinLog = "kotlinTest"
 const val CmdHff: Byte = 0xff.toByte()
 const val CmdHd55: Byte = 0x55.toByte()
 const val CmdDevHost = 0x80.toByte()
-const val CmdDevSrc = 0x16.toByte()
+const val CmdDevSrc = 0x30.toByte()
 const val CmdDevAg = 0x00.toByte()
 
 enum class CmdId(val value: Byte) {
@@ -62,8 +63,8 @@ enum class CmdId(val value: Byte) {
     GET_HFP_STA_RSP(0x4b.toByte()),
     GET_HFP_EXT_STA_REQ(0x4c.toByte()),
     GET_HFP_EXT_STA_RSP(0x4d.toByte()),
-    CMD_GET_SRC_DEV_NO_REQ(0x4e.toByte()),
-    CMD_GET_SRC_DEV_NO_RSP(0x4f.toByte()),
+    GET_SRC_DEV_NO_REQ(0x4e.toByte()),
+    GET_SRC_DEV_NO_RSP(0x4f.toByte()),
     GET_HFP_SPKEY_REQ(0x50.toByte()),
     GET_HFP_SPKEY_RSP(0x51.toByte()),
     GET_AG_SPKEY_REQ(0x52.toByte()),
@@ -123,7 +124,13 @@ class MainActivity : AppCompatActivity() {
                         when(msg.arg2) {
                             0 -> {
                                 when(msg.arg1) {
-                                    0 -> txvBtState0.text = "Bluetooth connected"
+                                    0 -> {
+                                        txvBtState0.text = "Bluetooth connected"
+                                        val getDevIdCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_SRC_DEV_NO_REQ.value , 1, 0x00, 0x00)
+                                        // sleep(10000);
+                                        btCmdSend(getDevIdCmd, 0)
+                                        txvFwVer0.text = "none"
+                                    }
                                     1 -> txvBtState1.text = "Bluetooth connected"
                                 }
                             }
@@ -197,8 +204,8 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         btnGetFwVer0.setOnClickListener {
+            // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_HFP_PAIR_REQ.value , 0, 0x00)
             val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.GET_HFP_VRESION_REQ.value , 0, 0x00)
-            // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevSrc, CmdId.CMD_GET_SRC_DEV_NO_REQ.value , 0, 0x00)
 
             btCmdSend(getFwCmd, 0)
             txvFwVer0.text = "none"
@@ -206,7 +213,8 @@ class MainActivity : AppCompatActivity() {
 
         btnGetFwVer1.setOnClickListener {
             // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, 0x04, 2, 0x04, 0xff.toByte(), 0x00)
-            val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_VRESION_REQ.value , 0, 0x00)
+            // val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_HFP_PAIR_REQ.value , 0, 0x00)
+             val getFwCmd = byteArrayOf(CmdHff, CmdHd55, CmdDevHost, CmdDevAg, CmdId.GET_AG_VRESION_REQ.value , 0, 0x00)
 
             // btCmdSend(getFwCmd, 1)
             btCmdSend(getFwCmd, 0)
@@ -461,7 +469,7 @@ class MainActivity : AppCompatActivity() {
         when(cmdBuf[4]) {
             CmdId.SET_AG_VOL_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} AG volume set")
             CmdId.SET_HFP_VOL_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP volume set")
-            CmdId.GET_HFP_STA_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP status get")
+            CmdId.GET_HFP_STA_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} destination ${cmdBuf[3].toString(16)} HFP status get")
             CmdId.GET_HFP_EXT_STA_RSP.value -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP extra status get")
             CmdId.GET_HFP_LOCAL_NAME_RSP.value -> {
                 Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} local name")
@@ -479,8 +487,11 @@ class MainActivity : AppCompatActivity() {
                 Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} firmware version")
                 txvFwVer1.text = String(cmdBuf, 6, cmdBuf[5].toInt())
             }
-            CmdId.CMD_GET_SRC_DEV_NO_RSP.value -> {
+            CmdId.GET_SRC_DEV_NO_RSP.value -> {
                 Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} source device number ${cmdBuf[6].toString(16)}")
+            }
+            CmdId.GET_HFP_VOL_RSP.value -> {
+                Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} volume ${cmdBuf[6].toString(16)}")
             }
             else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)}")
         }
